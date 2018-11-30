@@ -113,7 +113,7 @@ module.exports.checkUser = function (userData) {
                     }
                     else if(res===false)
                     {
-                        reject("Unable to find user: "+userData.userName);
+                        reject("Incorrect password for user : "+userData.userName);
                     }
 
 
