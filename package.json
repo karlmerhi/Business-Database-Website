@@ -1,0 +1,15 @@
+{
+  "name": "web322-app",
+  "version": "1.0.0",
+  "description": "Create and publish a web app that uses multiple routes which serve static files (HTML & CSS) as well as create a data service module for accessing data. This will serve as the scaffolding for future assignments.",
+  "main": "service.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Karl Merhi",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
