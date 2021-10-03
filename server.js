@@ -16,14 +16,14 @@ var path = require("path");
 var dataService = require("./data-service.js");
 var app = express();
 
+app.use(express.static('public/css'));
+
 var HTTP_PORT = process.env.PORT || 8080;
 
 // call this function after the http server starts listening for requests
 function onHttpStart() {
     console.log("Express http server listening on: " + HTTP_PORT);
 }
-
-app.use(express.static('public'));
 
 // setup a 'route' to listen on the default url path (http://localhost)
 app.get("/", function (req, res) {

@@ -1,0 +1,17 @@
+.myheader {
+    background-color: rgb(238, 253, 19);
+ }
+ 
+ body {
+  background-color: rgb(228, 227, 171);
+ }
+
+ span {
+
+    font-family: 'Raleway', sans-serif;
+ }
+
+ .navbar-default {
+    background-color: #ec5f5f !important;
+    border-color: #d84e4e !important;
+}
