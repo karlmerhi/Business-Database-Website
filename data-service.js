@@ -33,17 +33,13 @@ module.exports.getAllEmployees = () => {
 };
 
 module.exports.getManagers = () => {
-  var managers = [];
-  return new Promise( (resolve, reject) => {
-    for (var i = 0; i < employees.length; i++) {
-      if (employees[i].isManager == true) managers.push(employees[i]);
+  return new Promise ((resolve,reject) => {
+    var temp_manager = employees.filter(employee => employee.isManager == true);        
+    if (temp_manager.length == 0) {
+        reject ("no results returned");
     }
-
-    if (managers.length == 0) {
-        reject("No results returned");
-    }
-    resolve(managers);
-  });
+    resolve(temp_manager);
+  })
 };
 
 module.exports.getDepartments = () => {
@@ -54,4 +50,57 @@ module.exports.getDepartments = () => {
       reject("No results returned");
     }
   });
+};
+
+module.exports.addEmployee = (employeeData) => {
+  return new Promise((resolve, reject) => {
+    employeeData.employeeNum = (employees.length + 1);
+    employees.push(employeeData);
+    if(typeof employeeData.isManager == undefined) {
+      employeeData.isManager = false;
+    } else {
+      employeeData.isManager = true;
+    }
+    resolve(employees);
+  });
+};
+
+module.exports.getEmployeesByStatus = (status) => {
+  return new Promise ((resolve,reject) => {
+    var temp_status = employees.filter(employee => employee.status == status);        
+    if (temp_status.length == 0) {
+        reject ("no results returned");
+    }
+    resolve(temp_status);
+});
+};
+
+module.exports.getEmployeesByDepartment = (department) => {
+  return new Promise ((resolve,reject) => {
+    var temp_department = employees.filter(employee => employee.department == department);        
+    if (temp_department.length == 0) {
+        reject ("no results returned");
+    }
+    resolve(temp_department);
+});
+};
+
+module.exports.getEmployeesByManager = (manager) => {
+  return new Promise ((resolve,reject) => {
+    var temp_manager = employees.filter(employee => employee.employeeManagerNum == manager);        
+    if (temp_manager.length == 0) {
+        reject ("no results returned");
+    }
+    resolve(temp_manager);
+});
+};
+
+module.exports.getEmployeeByNum = (num) => {
+  return new Promise ((resolve,reject) => {
+    var temp_employee = employees.filter(employee => employee.employeeNum == num);        
+    if (temp_employee.length == 0) {
+        reject ("no results returned");
+    }
+    resolve(temp_employee);
+});
 };
