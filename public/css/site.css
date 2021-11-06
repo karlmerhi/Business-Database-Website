@@ -3,15 +3,12 @@
  }
  
  body {
-  background-color: rgb(228, 227, 171);
- }
-
- span {
-
-    font-family: 'Raleway', sans-serif;
+  background-color: black;
+  font-family: 'Raleway', sans-serif;
+  text-shadow: 7px 7px 7px #aaa;
  }
 
  .navbar-default {
-    background-color: #ec5f5f !important;
-    border-color: #d84e4e !important;
+    background-color: #dfe0cb !important;
+    border-color: #ececec !important;
 }
