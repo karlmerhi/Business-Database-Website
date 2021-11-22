@@ -1,18 +1,18 @@
 /*********************************************************************************
- * WEB322 – Assignment 04
+ * WEB322 – Assignment 05
  * I declare that this assignment is my own work in accordance with Seneca Academic
  * Policy. No part of this assignment has been copied manually or electronically
  * from any other source (including 3rd party web sites) or distributed to other students.
  *
  * Name: KARL MERHI
  * Student ID: 150828168
- * Date: 11/06/2021
+ * Date: 11/21/2021
  *
  * Online (Heroku) Link: https://aqueous-peak-42879.herokuapp.com/
  *
  ********************************************************************************/
 
- const dataService = require("./data-service.js");
+const dataService = require("./data-service.js");
 const multer = require("multer");
 const express = require("express");
 const exphbs = require("express-handlebars");
@@ -20,7 +20,7 @@ const path = require("path");
 const fs = require("fs");
 
 var app = express();
-app.use(express.static('public')); //to recognize the css files
+app.use(express.static("public")); //to recognize the css files
 app.use(express.urlencoded({ extended: true }));
 
 var HTTP_PORT = process.env.PORT || 8080;
@@ -28,13 +28,36 @@ var HTTP_PORT = process.env.PORT || 8080;
 // call this function after the http server starts listening for requests
 function onHttpStart() {
   console.log("Express http server listening on: " + HTTP_PORT);
+  return new Promise((res, req) => {
+    dataService
+      .initialize()
+      .then(() => {})
+      .catch((err) => {
+        console.log(err);
+      });
+  });
 }
 
-app.engine('.hbs',
-  exphbs({extname: '.hbs',
+app.engine(
+  ".hbs",
+  exphbs({
+    extname: ".hbs",
+    defaultLayout: "main",
+    runtimeOptions: {
+      allowProtoPropertiesByDefault: true,
+      allowProtoMethodsByDefault: true,
+    },
     helpers: {
       navLink: function (url, options) {
-        return "<li" + ((url == app.locals.activeRoute) ? ' class="active" ' : '') + '><a href="' + url + '">' + options.fn(this) + '</a></li>';
+        return (
+          "<li" +
+          (url == app.locals.activeRoute ? ' class="active" ' : "") +
+          '><a href="' +
+          url +
+          '">' +
+          options.fn(this) +
+          "</a></li>"
+        );
       },
       equal: function (lvalue, rvalue, options) {
         if (arguments.length < 3)
@@ -44,72 +67,58 @@ app.engine('.hbs',
         } else {
           return options.fn(this);
         }
-      }
-    }
+      },
+    },
   })
 );
-app.set('view engine', '.hbs');
+app.set("view engine", ".hbs");
 
 app.use(function (req, res, next) {
   let route = req.baseUrl + req.path;
-  app.locals.activeRoute = (route == "/") ? "/" : route.replace(/\/$/, "");
+  app.locals.activeRoute = route == "/" ? "/" : route.replace(/\/$/, "");
   next();
 });
 
-const imgPath = "/public/images/uploaded";
+const imgPath = "./public/images/uploaded";
 
 // multer requires a few options to be setup to store files with file extensions
 // by default it won't store extensions for security reasons
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, imgPath))
-  },
+  destination: imgPath,
   filename: function (req, file, cb) {
     cb(null, Date.now() + path.extname(file.originalname));
-  }
+  },
 });
+
 // tell multer to use the diskStorage function for naming files instead of the default.
 const upload = multer({ storage: storage });
-// prepares to receive the file
-app.post("/images/add", upload.single("imageFile"), function (req, res) {
-  res.redirect("/images");
-});
-//---------------------------------------------------------------------------
-app.get("/images", function (req, res) {
-  fs.readdir(path.join(__dirname, imgPath), function (err, items) {
 
-    var obj = { images: [] };
-    var size = items.length;
-    for (var i = 0; i < items.length; i++) {
-      obj.images.push(items[i]);
-    }
-    //res.json(obj);
-    //console.log(obj);
-    res.render("images",obj);
-  });
-});
-// setup a 'route' to listen on the default url path (http://localhost)
+// deafault URL (http://localhost)
 app.get("/", function (req, res) {
-  res.render(path.join(__dirname, "/views/home.hbs"));
+  res.render("home");
 });
 
 // setup another route to listen on /about
 app.get("/about", function (req, res) {
-  res.render(path.join(__dirname, "/views/about.hbs"));
+  res.render("about");
 });
 
-// setup another route to listen on /about
-app.get("/departments", function (req, res) {
-  dataService
-    .getDepartments()
-    .then((data) => {
-      res.render("departments", {departments: data});
-    })
-    .catch(() => {
-      res.render("employees", { message: "no results" });
-    });
+// image routes
+app.get("/images", (req, res) => {
+  fs.readdir(imgPath, function (err, items) {
+    res.render("images", { images: items });
+  });
 });
 
+app.get("/images/add", function (req, res) {
+  res.render("addImage");
+});
+
+app.post("/images/add", upload.single("imageFile"), (req, res) => {
+  res.redirect("/images");
+});
+
+//employee routes
 app.get("/employees", function (req, res) {
   if (req.query.status) {
     dataService
@@ -117,7 +126,7 @@ app.get("/employees", function (req, res) {
       .then((data) => {
         res.render("employees", { employees: data });
       })
-      .catch(() => {
+      .catch((err) => {
         res.render("employees", { message: "no results" });
       });
   } else if (req.query.department) {
@@ -126,7 +135,7 @@ app.get("/employees", function (req, res) {
       .then((data) => {
         res.render("employees", { employees: data });
       })
-      .catch(() => {
+      .catch((err) => {
         res.render("employees", { message: "no results" });
       });
   } else if (req.query.manager) {
@@ -135,7 +144,7 @@ app.get("/employees", function (req, res) {
       .then((data) => {
         res.render("employees", { employees: data });
       })
-      .catch(() => {
+      .catch((err) => {
         res.render("employees", { message: "no results" });
       });
   } else {
@@ -144,61 +153,159 @@ app.get("/employees", function (req, res) {
       .then((data) => {
         res.render("employees", { employees: data });
       })
-      .catch(() => {
+      .catch((err) => {
         res.render("employees", { message: "no results" });
       });
   }
 });
 
-// setup another route to listen on /about
-app.get("/employees/add", function (req, res) {
-  res.render(path.join(__dirname, "/views/addEmployee.hbs"));
+app.get("/employees/add", (req, res) => {
+  dataService
+    .getDepartments()
+    .then((data) => {
+      res.render("addEmployee", { departments: data });
+    })
+    .catch((err) => {
+      res.render("addEmployee", { departments: [] });
+    });
 });
 
 app.post("/employees/add", function (req, res) {
   dataService
     .addEmployee(req.body)
-    .then((data) => {
+    .then(() => {
       res.redirect("/employees");
     })
-    .catch(() => {
+    .catch((err) => {
       res.render("employees", { message: "no results" });
     });
 });
 
-app.get("/employee/:empNum", function (req, res) {
+app.post("/employee/update", (req, res) => {
   dataService
-    .getEmployeeByNum(req.params.empNum)
-    .then((data) => {
-      res.render("employee", { employee: data });
+    .updateEmployee(req.body)
+    .then(() => {
+      res.redirect("/employees");
     })
-    .catch(() => {
-      res.render("employee",{message:"no results"});
+    .catch((err) => {
+      res.status(500).send("Unable to Update Employee");
     });
 });
 
-app.post("/employee/update", (req, res) => {
-  dataService.updateEmployee(req.body).then(() => {
-    res.redirect("/employees");
-  })
-  .catch(() => {
-    res.render("employee",{message:"no results"});
-  });
+app.get("/employee/:empNum", (req, res) => {
+  let viewData = {};
+
+  dataService
+    .getEmployeeByNum(req.params.empNum)
+    .then((data) => {
+      if (data) {
+        viewData.employee = data;
+      } else {
+        viewData.employee = null;
+      }
+    })
+    .catch(() => {
+      viewData.employee = null;
+    })
+    .then(dataService.getDepartments)
+    .then((data) => {
+      viewData.departments = data;
+
+      for (let i = 0; i < viewData.departments.length; i++) {
+        if (
+          viewData.departments[i].departmentId == viewData.employee.department
+        ) {
+          viewData.departments[i].selected = true;
+        }
+      }
+    })
+    .catch(() => {
+      viewData.departments = [];
+    })
+    .then(() => {
+      if (viewData.employee == null) {
+        res.status(404).send("Employee Not Found");
+      } else {
+        res.render("employee", { viewData: viewData });
+      }
+    });
 });
 
-app.get("/images/add", function (req, res) {
-  res.render(path.join(__dirname, "/views/addImage.hbs"));
+app.get("/employees/delete/:empNum", (req, res) => {
+  dataService
+    .deleteEmployeeByNum(req.params.empNum)
+    .then((data) => {
+      res.redirect("/employees");
+    })
+    .catch((err) => {
+      res.status(500).send("Unable to Remove Employee / Employee not found)");
+    });
+});
+
+//department routes
+app.get("/departments", function (req, res) {
+  dataService
+    .getDepartments()
+    .then((data) => {
+      res.render("departments", { departments: data });
+    })
+    .catch((err) => {
+      res.render("departments", { message: "no results" });
+    });
+});
+
+app.get("/departments/add", function (req, res) {
+  res.render("addDepartment");
+});
+
+app.post("/departments/add", function (req, res) {
+  dataService
+    .addDepartment(req.body)
+    .then(() => {
+      res.redirect("/departments");
+    })
+    .catch((err) => {
+      res.render("departments", { message: "no results" });
+    });
+});
+
+app.post("/department/update", (req, res) => {
+  dataService
+    .updateDepartment(req.body)
+    .then(() => {
+      res.redirect("/departments");
+    })
+    .catch((err) => {
+      res.render("departments");
+    });
+});
+
+app.get("/department/:departmentId", function (req, res) {
+  dataService
+    .getDepartmentById(req.params.departmentId)
+    .then((data) => {
+      res.render("department", { department: data });
+    })
+    .catch((err) => {
+      res.status(404).send("Department Not Found");
+    });
+});
+
+app.get("/departments/delete/:departmentId", (req, res) => {
+  dataService
+    .deleteDepartmentById(req.params.departmentId)
+    .then((data) => {
+      res.redirect("/departments");
+    })
+    .catch((err) => {
+      res
+        .status(500)
+        .send("Unable to Remove Department / Department not found)");
+    });
 });
 
 app.use((req, res) => {
   res.status(404).send("Page Not Found");
 });
 
-dataService
-  .initialize()
-  .then(() => {
-    app.listen(HTTP_PORT, onHttpStart); //start the server
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+app.listen(HTTP_PORT, onHttpStart);
