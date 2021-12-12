@@ -8,21 +8,14 @@
             <table class="table ">
                 <thead>
                     <tr>
-                        <th>Login Date/Time</th>
-                        <th>Client Information</th>
+                        <th>Login&nbsp;Date/Time</th>
+                        <th>Client&nbsp;Information</th>
                     </tr>
                 </thead>
                 <tbody>
                     {{#each session.user.loginHistory}}
                     <tr>
-                        <td>{{dateTime}}</td>
-                        <td>{{userAgent}}</td>
-                    </tr>
-                    {{/each}}
-                    {{#each session.user}}
-                    <tr>
-                        <td>{{loginHistory.dateTime}}</td>
-                        <td>{{loginHistory.userAgent}}</td>
+                        <td>{{this}}</td>
                     </tr>
                     {{/each}}
                 </tbody>
