@@ -1,4 +1,5 @@
 // require mongoose and setup the Schema
+require('dotenv').config();
 var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 // require bcrypt to hash passwords
@@ -24,7 +25,7 @@ let User;
 module.exports.initialize = () => {
   return new Promise((resolve, reject) => {
     let db = mongoose.createConnection(
-      "mongodb+srv://kmerhi1:6XmvjtlEYb2lbYVQ@senecaweb.mpjwr.mongodb.net/SenecaWeb?retryWrites=true&w=majority"
+      process.env.MongoDB_CONNECT
     );
 
     db.on("error", (err) => {
