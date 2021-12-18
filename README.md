@@ -1,5 +1,4 @@
-# WEB322-FALL
-WEB322 Fall Semester
+# Business Database Website
 
 ### Languages and Tools Used:
 
